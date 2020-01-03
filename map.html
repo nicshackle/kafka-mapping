@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transactions Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+</head>
+
+<style>
+    #title {
+        position: absolute;
+        font-size: 50px;
+        z-index: 100;
+        font-family: "Helvetica Neue";
+        font-weight: bold;
+        left: 40px;
+        bottom: 60px;
+        color: #717575;
+    }
+
+    #legend{
+        color:  #878b8b;
+        position: absolute;
+        font-size: 20px;
+        z-index: 100;
+        font-family: "Helvetica Neue";
+        font-weight: normal;
+        left: 40px;
+        bottom: 40px;
+    }
+
+    #map {
+        z-index: 10;
+        position: absolute;
+        width: 100%;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
+    }
+
+    #markercontainer {
+        margin: -45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+    }
+
+    #marker {
+        height: 9%;
+        width: 9%;
+        background-color: #007abb;
+        border-radius: 50%;
+        animation-name: pulse;
+        animation-duration: 20s;
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        40% {
+            opacity: 0.3;
+        }
+        80% {
+            transform: scale(5);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(8);
+        }
+    }
+</style>
+<body style="padding: 0; margin: 0;">
+<div id="title">Transactions</div>
+<div id="legend">
+    Blue indicates successful transactions, red indicates failures.
+</div>
+<div id="map">
+    <script>
+
+      var socket = io('http://localhost:3000');
+      socket.on('connect', (data) => console.log("connected: ", data));
+      socket.on('disconnect', (data) => console.log("disconnect: ", data));
+
+      var map = new L.Map("map", {
+        center: new L.LatLng(-30.563421, 22.645058),
+        zoom: 7
+      });
+
+      L.tileLayer('https://api.mapbox.com/styles/v1/nsnsns/ck4y8s32d18d41cmnwlilqy58/tiles/{z}/{x}/{y}?access_token={token}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox/streets-v11'
+      }).addTo(map);
+
+
+      function addMarker(lat, long, failed, info) {
+
+
+        // Creating a marker
+        var colour = failed ? "#ff3000" : "#039fd3";
+        var icon = L.divIcon({
+          className: 'map-marker',
+          html: '<div id="markercontainer"><div id="marker" style="background-color: ' + colour + '"/></div>'
+        });
+        var marker = L.marker([lat, long], {icon: icon});
+        // Adding marker to the map
+        marker.addTo(map).bindPopup(info);
+
+        setTimeout(() => {
+          marker.remove()
+        }, 15*1000) // it's important that this timeout is shorter than the css animation
+      }
+
+      socket.on('transaction', (data) => addMarker(data.lat, data.long, data.failed, data.info));
+    </script>
+</div>
+</body>
+
+</html>
