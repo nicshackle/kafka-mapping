@@ -1,4 +1,4 @@
-# kafka-mapping
+# kafka-transactions-mapping
 
 ### See it running [here](https://yoco-transactions-map.herokuapp.com/) (if I've turned the dynos on)
 ____________________________
