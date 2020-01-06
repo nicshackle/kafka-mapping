@@ -1,24 +1,31 @@
 const server = require('http').createServer();
 const io = require('socket.io')(server);
 const ip = require('ip');
+const fs = require('fs')
 const uuid = require('uuid')
 const { Kafka } = require('kafkajs');
 
-const host = process.env.HOST_IP || ip.address();
-
 const kafka = new Kafka({
   clientId: 'transactions-map',
-  brokers: [`${host}:9092`]
+  brokers: [`moped-01.srvs.cloudkafka.com:9094`, `moped-02.srvs.cloudkafka.com:9094`, `moped-03.srvs.cloudkafka.com:9094`],
+  ssl: true,
+  authenticationTimeout: 1000,
+  reauthenticationThreshold: 10000,
+  sasl: {
+    mechanism: 'scram-sha-512', // scram-sha-256 or scram-sha-512
+    username: `${process.env.KAFKA_USERNAME}`,
+    password: `${process.env.KAFKA_PASSWORD}`
+  },
 });
 
-const topic = 'yoco-transactions';
+const topic = 'u2ptt72c-transactions';
 
 io.on('connection', socket => {
   console.log("client connected");
 
   socket.on('disconnect', () => {
     console.log("client disconnected")
-    stop().catch(e => console.error(`[stopping consumger] ${e.message}`, e));
+    stop().catch(e => console.error(`[stopping consumer] ${e.message}`, e));
   });
 
   // each client will get a new kafka consumer and consumer group ID

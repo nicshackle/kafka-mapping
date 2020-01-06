@@ -2,15 +2,21 @@ const ip = require('ip')
 
 const {Kafka, logLevel} = require('kafkajs')
 
-const host = process.env.HOST_IP || ip.address()
-
 const kafka = new Kafka({
-  logLevel: logLevel.DEBUG,
-  brokers: [`${host}:9092`],
-  clientId: 'example-producer',
+  logLevel: logLevel.INFO,
+  clientId: 'transactions-map',
+  brokers: [`moped-01.srvs.cloudkafka.com:9094`, `moped-02.srvs.cloudkafka.com:9094`, `moped-03.srvs.cloudkafka.com:9094`],
+  ssl: true,
+  authenticationTimeout: 1000,
+  reauthenticationThreshold: 10000,
+  sasl: {
+    mechanism: 'scram-sha-512', // scram-sha-256 or scram-sha-512
+    username: `${process.env.KAFKA_USERNAME}`,
+    password: `${process.env.KAFKA_PASSWORD}`
+  },
 })
 
-const topic = 'yoco-transactions'
+const topic = 'u2ptt72c-transactions'
 const producer = kafka.producer()
 
 const sendMessage = () => {
@@ -29,7 +35,7 @@ const sendMessage = () => {
 
 const run = async () => {
   await producer.connect()
-  setInterval(sendMessage, 500)
+  setInterval(sendMessage, 3000)
 }
 
 run().catch(e => console.error(`[example/producer] ${e.message}`, e))
