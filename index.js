@@ -1,9 +1,13 @@
-const server = require('http').createServer();
+const express = require('express');
+const app = express();
+const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const ip = require('ip');
 const fs = require('fs')
 const uuid = require('uuid')
 const { Kafka } = require('kafkajs');
+
+app.use(express.static('public'))
 
 const kafka = new Kafka({
   clientId: 'transactions-map',
