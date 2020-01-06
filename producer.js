@@ -23,7 +23,7 @@ const sendMessage = () => {
       topic,
       messages: [
         {
-          key: 'transaction', value: `${-33.822028 + Math.random()*7},${19.419810 + Math.random()*10},${Math.random() <= 0.2 ? true:''},"Standard Bank"`
+          key: 'transaction', value: `${-33.822028 + Math.random()*7},${19.419810 + Math.random()*10},${Math.random() <= 0.2 ? true:''},"R${Math.round(Math.random()*1000)}"`
         }
       ]
     })
