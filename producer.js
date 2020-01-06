@@ -1,5 +1,3 @@
-const ip = require('ip')
-
 const {Kafka, logLevel} = require('kafkajs')
 
 const kafka = new Kafka({
@@ -35,7 +33,7 @@ const sendMessage = () => {
 
 const run = async () => {
   await producer.connect()
-  setInterval(sendMessage, 3000)
+  setInterval(sendMessage, 1500)
 }
 
 run().catch(e => console.error(`[example/producer] ${e.message}`, e))

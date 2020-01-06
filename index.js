@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const ip = require('ip');
-const fs = require('fs')
 const uuid = require('uuid')
 const { Kafka } = require('kafkajs');
 
