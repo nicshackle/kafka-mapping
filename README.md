@@ -1,6 +1,6 @@
 # kafka-mapping
 
-### See it running [here](https://yoco-transactions-map.herokuapp.com/) (if I've turned the dyno's on)
+### See it running [here](https://yoco-transactions-map.herokuapp.com/) (if I've turned the dynos on)
 ____________________________
 
 ### Running locally
