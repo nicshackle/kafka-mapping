@@ -43,6 +43,7 @@ io.on('connection', socket => {
     await consumer.connect()
     await consumer.subscribe({ topic, fromBeginning: false })
     await consumer.run({
+      autoCommitInterval: 500,
       eachMessage: async ({ topic, partition, message }) => {
         const prefix = `${topic}/${partition}|${message.offset}/${message.timestamp}`
         console.log(`Consumer rxd: ${prefix} ${message.key}:${message.value}`)
