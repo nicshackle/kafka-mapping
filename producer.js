@@ -35,7 +35,7 @@ const sendMessage = () => {
 
 const run = async () => {
   await producer.connect()
-  setInterval(sendMessage, ${process.env.MESSAGE_INTERVAL})
+  setInterval(sendMessage, process.env.MESSAGE_INTERVAL || 3000)
 }
 
 run().catch(e => console.error(`[example/producer] ${e.message}`, e))
