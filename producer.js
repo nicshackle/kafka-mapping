@@ -3,18 +3,18 @@ const {Kafka, logLevel} = require('kafkajs')
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
   clientId: 'transactions-map',
-  brokers: [`moped-01.srvs.cloudkafka.com:9094`, `moped-02.srvs.cloudkafka.com:9094`, `moped-03.srvs.cloudkafka.com:9094`],
+  brokers: [`pkc-4nym6.us-east-1.aws.confluent.cloud:9092`],
   ssl: true,
   authenticationTimeout: 1000,
   reauthenticationThreshold: 10000,
   sasl: {
-    mechanism: 'scram-sha-512', // scram-sha-256 or scram-sha-512
+    mechanism: 'PLAIN',
     username: `${process.env.KAFKA_USERNAME}`,
     password: `${process.env.KAFKA_PASSWORD}`
   },
 })
 
-const topic = 'u2ptt72c-transactions'
+const topic = 'transactions'
 const producer = kafka.producer()
 
 const sendMessage = () => {
