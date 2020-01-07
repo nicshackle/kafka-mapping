@@ -1,4 +1,4 @@
-const {Kafka, logLevel} = require('kafkajs')
+const {Kafka,CompressionTypes,logLevel} = require('kafkajs')
 
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
@@ -21,9 +21,11 @@ const sendMessage = () => {
   return producer
     .send({
       topic,
+      compression: CompressionTypes.GZIP,
       messages: [
         {
-          key: 'transaction', value: `${-33.822028 + Math.random()*7},${19.419810 + Math.random()*10},${Math.random() <= 0.2 ? true:''},"R${Math.round(Math.random()*1000)}"`
+          key: 'transaction',
+          value: `${-33.822028 + Math.random() * 7},${19.419810 + Math.random() * 10},${Math.random() <= 0.2 ? true : ''},"R${Math.round(Math.random() * 1000)}"`
         }
       ]
     })
@@ -33,7 +35,7 @@ const sendMessage = () => {
 
 const run = async () => {
   await producer.connect()
-  setInterval(sendMessage, 1500)
+  setInterval(sendMessage, ${process.env.MESSAGE_INTERVAL})
 }
 
 run().catch(e => console.error(`[example/producer] ${e.message}`, e))
