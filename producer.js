@@ -1,4 +1,4 @@
-const {Kafka,CompressionTypes,logLevel} = require('kafkajs')
+const {Kafka, CompressionTypes, logLevel} = require('kafkajs')
 
 const kafka = new Kafka({
   logLevel: logLevel.INFO,
@@ -18,6 +18,14 @@ const topic = 'transactions'
 const producer = kafka.producer()
 
 const sendMessage = () => {
+  const data = {
+      lat: -33.822028 + Math.random() * 7,
+      long: 19.419810 + Math.random() * 10,
+      failed: Math.random() <= 0.2,
+      info: Math.round(Math.random() * 1000),
+    }
+
+
   return producer
     .send({
       topic,
@@ -25,7 +33,7 @@ const sendMessage = () => {
       messages: [
         {
           key: 'transaction',
-          value: `${-33.822028 + Math.random() * 7},${19.419810 + Math.random() * 10},${Math.random() <= 0.2 ? true : ''},"R${Math.round(Math.random() * 1000)}"`
+          value: JSON.stringify(data)
         }
       ]
     })
