@@ -22,7 +22,7 @@ const sendMessage = () => {
       lat: -33.822028 + Math.random() * 7,
       long: 19.419810 + Math.random() * 10,
       failed: Math.random() <= 0.2,
-      info: Math.round(Math.random() * 1000),
+      info: `Transaction State: Test <br/> Processing Bank: Test <br/> Amount: R100 <br/>`,
     }
 
 

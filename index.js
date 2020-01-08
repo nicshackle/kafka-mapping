@@ -20,13 +20,15 @@ const kafka = new Kafka({
   },
 })
 
-const consumer = kafka.consumer({groupId: `transaction-consumer-server`})
+const consumer = kafka.consumer({
+  groupId: `transaction-consumer-server`,
+  maxWaitTimeInMs: 500
+})
 
 const run = async () => {
   await consumer.connect()
   await consumer.subscribe({topic: 'transactions', fromBeginning: false})
   await consumer.run({
-    autoCommitInterval: 100,
     eachMessage: async ({topic, partition, message}) => {
       const prefix = `${topic}/${partition}|${message.offset}/${message.timestamp}`
       console.log(`Consumer rxd: ${prefix} ${message.key}:${message.value}`)
