@@ -4,7 +4,7 @@
 ____________________________
 
 ### Running locally
-The current configuration relies on a free-tier [managed Kafka broker](https://www.cloudkarafka.com/). However, if you would like to run the broker+stack locally, do the following:
+The current configuration uses a managed broker with [Confluent](https://www.confluent.io/). However, if you would like to run the broker+stack locally, do the following:
 
 1. In `producer.js` and `index.js`, change the Kafka instantiation to the following:
 ```

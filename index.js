@@ -26,7 +26,7 @@ const run = async () => {
   await consumer.connect()
   await consumer.subscribe({ topic: 'transactions', fromBeginning: false })
   await consumer.run({
-    autoCommitThreshold: 1,
+    autoCommitInterval: 500,
     eachMessage: async ({ topic, partition, message }) => {
       const prefix = `${topic}/${partition}|${message.offset}/${message.timestamp}`
       console.log(`Consumer rxd: ${prefix} ${message.key}:${message.value}`)
