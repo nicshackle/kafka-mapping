@@ -20,48 +20,58 @@ const kafka = new Kafka({
   },
 });
 
-const topic = 'transactions';
+const consumer = kafka.consumer({ groupId: `transaction-consumer-server`+uuid.v1()});
 
-io.on('connection', socket => {
-  console.log("client connected");
+const run = async () => {
+  await consumer.connect()
+  await consumer.subscribe({ topic: 'transactions', fromBeginning: false })
+  await consumer.run({
+    autoCommitThreshold: 1,
+    eachMessage: async ({ topic, partition, message }) => {
+      const prefix = `${topic}/${partition}|${message.offset}/${message.timestamp}`
+      console.log(`Consumer rxd: ${prefix} ${message.key}:${message.value}`)
+      io.sockets.emit('transaction',
+        {
+          lat: message.value.toString().split(',')[0],
+          long: message.value.toString().split(',')[1],
+          failed: message.value.toString().split(',')[2],
+          info: message.value.toString().split(',')[3],
+        }
+      );
+    },
+  })
+};
 
-  socket.on('disconnect', () => {
-    console.log("client disconnected")
-    stop().catch(e => console.error(`[stopping consumer] ${e.message}`, e));
-  });
+const stop = async () => {
+  console.log("stopping consumer...")
+  await consumer.stop()
+  await consumer.disconnect()
+}
 
-  // each client will get a new kafka consumer and consumer group ID
-  const consumer = kafka.consumer({ groupId: `frontend-consumer-`+uuid.v1()});
+const errorTypes = ['unhandledRejection', 'uncaughtException']
+const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
 
-  const stop = async () => {
-    console.log("stopping consumer...")
-    await consumer.stop()
-    await consumer.disconnect()
-  }
+errorTypes.map(type => {
+  process.on(type, async () => {
+    try {
+      console.log(`process.on ${type}`)
+      await stop()
+      process.exit(0)
+    } catch (_) {
+      process.exit(1)
+    }
+  })
+})
 
-  const run = async () => {
-    await consumer.connect()
-    await consumer.subscribe({ topic, fromBeginning: false })
-    await consumer.run({
-      autoCommitThreshold: 1,
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}/${partition}|${message.offset}/${message.timestamp}`
-        console.log(`Consumer rxd: ${prefix} ${message.key}:${message.value}`)
-        socket.emit('transaction',
-          {
-            lat: message.value.toString().split(',')[0],
-            long: message.value.toString().split(',')[1],
-            failed: message.value.toString().split(',')[2],
-            info: message.value.toString().split(',')[3],
-          }
-        );
-      },
-    })
-  };
+signalTraps.map(type => {
+  process.once(type, async () => {
+    try {
+      await stop()
+    } finally {
+      process.kill(process.pid, type)
+    }
+  })
+})
 
-  run().catch(e => console.error(`[example/consumer] ${e.message}`, e));
-
-});
-
-
+run().catch(e => console.error(`[example/consumer] ${e.message}`, e));
 server.listen(process.env.PORT || 3000);
