@@ -2,7 +2,6 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-const uuid = require('uuid')
 const {Kafka} = require('kafkajs')
 
 app.use(express.static('public'))
