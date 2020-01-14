@@ -87,16 +87,19 @@ function onFrame() {
       return !cell.isDead
     })
 
-    //periodically add new cells -- TODO do this on rxing socket events
-    var position = Point.random() * view.size
-    var vector = new Point({
-      angle: 360 * Math.random(),
-      length: Math.random() * 10
-    })
-    var radius = Math.random() * 50 + 10
-    var colour = Math.random() < 0.8 ? 'powderblue' : 'tomato'
-    cells.push(new Cell(radius, position, vector, colour))
-
     lastTick = Date.now()
   }
 }
+
+// connect to socket and create cells on each transaction event
+var socket = io();
+socket.on('transaction', function (data) {
+  var position = Point.random() * view.size
+  var vector = new Point({
+    angle: 360 * Math.random(),
+    length: Math.random() * 10
+  })
+  var radius = Math.random() * 50 + 10
+  var colour = data.failed ? 'tomato' : 'powderblue';
+  cells.push(new Cell(radius, position, vector, colour))
+});
